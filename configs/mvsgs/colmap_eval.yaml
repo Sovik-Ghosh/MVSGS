@@ -6,24 +6,25 @@ test_dataset_module: lib.datasets.colmap.mvsgs
 mvsgs:
     eval_center: True
     reweighting: True
-    scale_factor: 1  # Changed from 12 to 1
+    scale_factor: 12
+    memory_saving: True  # Add this to enable memory optimizations
     cas_config:
         render_if: [False, True]
-        volume_planes: [64, 8]  # Changed from [16, 8]
-        volume_scale: [0.125, 0.5]  # Added from DTU config
-        im_feat_scale: [0.25, 0.5]  # Added from DTU config
-        im_ibr_scale: [0.25, 1.]  # Added from DTU config
-        render_scale: [0.25, 1.0]  # Added from DTU config
+        volume_planes: [16, 8]  # Reduced from [64, 8]
+        volume_scale: [0.125, 0.5]
+        im_feat_scale: [0.25, 0.5]
+        im_ibr_scale: [0.25, 1.]
+        render_scale: [0.25, 1.0]
 
 train_dataset:
     data_root: 'examples'
     split: 'train'
-    input_h_w: [768, 1152]  # Changed from [640, 960]
+    input_h_w: [512, 384]  # Back to original size to save memory
     input_ratio: 1.
     scene: ''
 
 test_dataset:
     data_root: 'examples'
     split: 'test'
-    input_h_w: [768, 1152]  # Changed from [640, 960]
+    input_h_w: [512, 384]
     scene: ''
