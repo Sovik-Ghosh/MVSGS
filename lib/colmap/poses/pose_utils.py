@@ -9,17 +9,17 @@ import poses.colmap_read_model as read_model
 
 
 def load_colmap_data(realdir):
-    
     camerasfile = os.path.join(realdir, 'sparse/0/cameras.bin')
     camdata = read_model.read_cameras_binary(camerasfile)
     
-    # cam = camdata[camdata.keys()[0]]
+    print('Number of camera models:', len(camdata))
+    
+    # Take the first camera model
     list_of_keys = list(camdata.keys())
     cam = camdata[list_of_keys[0]]
-    print( 'Cameras', len(cam))
-
+    print(f'Using camera model {cam.id}: {cam.model} with dimensions {cam.width}x{cam.height}')
+    
     h, w, f = cam.height, cam.width, cam.params[0]
-    # w, h, f = factor * w, factor * h, factor * f
     hwf = np.array([h,w,f]).reshape([3,1])
     
     imagesfile = os.path.join(realdir, 'sparse/0/images.bin')
@@ -54,37 +54,61 @@ def load_colmap_data(realdir):
 
 
 def save_poses(basedir, poses, pts3d, perm):
+    # First, get all image IDs in the reconstruction
+    all_image_ids = set()
+    for k in pts3d:
+        all_image_ids.update(pts3d[k].image_ids)
+    
+    # Create a mapping from COLMAP image IDs to sequential indices
+    id_to_index = {}
+    for i, img_id in enumerate(sorted(all_image_ids)):
+        id_to_index[img_id] = i
+    
+    # Number of images in the dataset
+    num_images = poses.shape[-1]
+    print(f"Number of poses: {num_images}")
+    print(f"Min image ID: {min(all_image_ids)}, Max image ID: {max(all_image_ids)}")
+    
     pts_arr = []
     vis_arr = []
     for k in pts3d:
         pts_arr.append(pts3d[k].xyz)
-        cams = [0] * poses.shape[-1]
+        cams = [0] * num_images
         for ind in pts3d[k].image_ids:
-            if len(cams) < ind - 1:
-                print('ERROR: the correct camera poses for current points cannot be accessed')
-                return
-            cams[ind-1] = 1
+            # Use the mapping instead of direct indexing
+            if ind in id_to_index and id_to_index[ind] < num_images:
+                cams[id_to_index[ind]] = 1
+            else:
+                print(f'Warning: Point {k} is visible in image {ind} but this ID is not in our mapping')
         vis_arr.append(cams)
 
     pts_arr = np.array(pts_arr)
     vis_arr = np.array(vis_arr)
-    print( 'Points', pts_arr.shape, 'Visibility', vis_arr.shape )
+    print('Points', pts_arr.shape, 'Visibility', vis_arr.shape)
     
+    # Rest of the function remains unchanged
     zvals = np.sum(-(pts_arr[:, np.newaxis, :].transpose([2,0,1]) - poses[:3, 3:4, :]) * poses[:3, 2:3, :], 0)
     valid_z = zvals[vis_arr==1]
-    print( 'Depth stats', valid_z.min(), valid_z.max(), valid_z.mean() )
+    print('Depth stats', valid_z.min(), valid_z.max(), valid_z.mean())
     
     save_arr = []
     for i in perm:
         vis = vis_arr[:, i]
         zs = zvals[:, i]
         zs = zs[vis==1]
-        close_depth, inf_depth = np.percentile(zs, .1), np.percentile(zs, 99.9)
-        # print( i, close_depth, inf_depth )
-        
-        save_arr.append(np.concatenate([poses[..., i].ravel(), np.array([close_depth, inf_depth])], 0))
-    save_arr = np.array(save_arr)
+        if len(zs) > 0:  # Add check to avoid empty arrays
+            close_depth, inf_depth = np.percentile(zs, .1), np.percentile(zs, 99.9)
+            save_arr.append(np.concatenate([poses[..., i].ravel(), np.array([close_depth, inf_depth])], 0))
+        else:
+            print(f'Warning: No valid depths for image {i}')
+            # Use default depth values or skip this image
+            # Here we use mean depths from other images if available
+            if len(valid_z) > 0:
+                close_depth = valid_z.min()
+                inf_depth = valid_z.max()
+                save_arr.append(np.concatenate([poses[..., i].ravel(), np.array([close_depth, inf_depth])], 0))
     
+    save_arr = np.array(save_arr)
     np.save(os.path.join(basedir, 'poses_bounds.npy'), save_arr)
             
 

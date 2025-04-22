@@ -1,0 +1,7 @@
+# ninja log v5
+0	19894	1745335500708134798	/teamspace/studios/this_studio/Spatial3D/MVSGS/lib/submodules/simple-knn/build/temp.linux-x86_64-cpython-310/ext.o	74c3dd1c0c29d262
+0	49550	1745335530344680583	/teamspace/studios/this_studio/Spatial3D/MVSGS/lib/submodules/simple-knn/build/temp.linux-x86_64-cpython-310/simple_knn.o	bda3928df80baa44
+0	201731	1745335682507454033	/teamspace/studios/this_studio/Spatial3D/MVSGS/lib/submodules/simple-knn/build/temp.linux-x86_64-cpython-310/spatial.o	ad8bef30bd65e77e
+37	19346	1745340236771899254	/teamspace/studios/this_studio/Spatial3D/MVSGS/lib/submodules/simple-knn/build/temp.linux-x86_64-cpython-310/ext.o	74c3dd1c0c29d262
+37	47848	1745340265252402329	/teamspace/studios/this_studio/Spatial3D/MVSGS/lib/submodules/simple-knn/build/temp.linux-x86_64-cpython-310/simple_knn.o	235901ce5d018b60
+37	195048	1745340412438998427	/teamspace/studios/this_studio/Spatial3D/MVSGS/lib/submodules/simple-knn/build/temp.linux-x86_64-cpython-310/spatial.o	740a7ddc1e3fccc5

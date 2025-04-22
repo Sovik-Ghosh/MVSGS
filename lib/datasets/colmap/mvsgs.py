@@ -29,7 +29,7 @@ class Dataset:
     def build_metas(self):
         if len(self.scenes) == 0:
             ### set your own scenes
-            scenes = ['scene1', 'scene2']
+            scenes = ['scene1']
         else:
             scenes = self.scenes
         self.scene_infos = {}
