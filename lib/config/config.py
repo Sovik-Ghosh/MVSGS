@@ -114,7 +114,7 @@ cfg.train.batch_size = 4
 cfg.test = CN()
 cfg.test.batch_size = 1
 cfg.test.collator = 'default'
-cfg.test.epoch = -1
+cfg.test.epoch = 'ssim_best'
 cfg.test.batch_sampler = 'default'
 cfg.test.sampler_meta = CN({})
 

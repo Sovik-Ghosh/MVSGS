@@ -56,6 +56,8 @@ class Dataset:
             train_ids = [j for j in range(img_len) if j not in render_ids]
             if self.split == 'train':
                 render_ids = train_ids
+            elif self.split == 'all':  # ADD THIS NEW CONDITION
+                render_ids = [j for j in range(img_len)]  # Use all images
             #
             c2ws = c2ws[train_ids]
             for i in render_ids:
